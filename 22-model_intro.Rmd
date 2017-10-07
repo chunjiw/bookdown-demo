@@ -1,0 +1,9 @@
+# Model Introduction
+
+Author: Ron 
+Reviewer:
+
+To confirm a hypothesis you must use data independent of the data that you used to generate the hypothesis. To do confirmatory analysis, one approach is to split data into three pieces before begin the analysis:
+1. 60% goes into **training** set.
+2. 20 goes into **query** set. You can use this data to compare models or visualisations by hand.
+3. 20% is kept as **test** set. Use this data only ONCE to test final model.
