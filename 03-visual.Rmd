@@ -1,9 +1,19 @@
 # Data visualisation {#visual}
 
+Author: Ron
+
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(nycflights13)
 ```
+## 3.2 First steps
+### 3.2.4 Exercises {-}
+4. Make a scatter plot of hwy vs cyl.
+```{r}
+ggplot(data = mpg, mapping = aes(x= hwy, y=cyl))+
+  geom_point()
+```
+
 
 ## 3.6 Geometric objects {-}
 ### 3.6.1 Exercises {-}
