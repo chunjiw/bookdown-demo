@@ -43,5 +43,23 @@ ggplot(diamonds) +
 
 Seems like `x` and `y` should be length and width, and `z` is depth.
 
+2. Explore the distribution of `price`. Do you discover anything unusual or surprising? (Hint: Carefully think about the `binwidth` and make sure you try a wide range of values.)
+```{r}
+diamonds %>%
+  count(cut_width(price,1000))
+# stacking by color
+diamonds %>% ggplot() + 
+  geom_histogram(aes(x = price,color = color),position = "stack",bins = 100)
+
+ggplot(diamonds) + 
+  geom_freqpoly(aes(x=price,color = cut),bins = 1000)+
+  coord_cartesian(xlim = c(1000,20000))
+```
+
+```{r}
+ggplot(diamonds) + 
+  geom_freqpoly(aes(x=price,color = color),bins = 1000) +
+  coord_cartesian(xlim = c(10000,20000))
+```
 
 
