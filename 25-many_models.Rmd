@@ -154,4 +154,187 @@ gapminder %>%
 ```
 
 
-### List-columns
+## List-columns
+Note:
+The meaning of list-columns is *a column as a list contains arbitary data structure you want*.
+```{r}
+# example of creating a list-columns
+tibble(
+  x = list(1:3,3:5),
+  y = list(letters[1:4],as.factor(letters[5:9]))
+)
+
+```
+
+
+## Creating list-columns
+
+Note:
+1. `tidyr::nest()` to convert a `grouped` data frame into nested data frame.
+2. `mutate()` with vectorised functions.
+3. `summarise()` with summary functions
+
+#### With nesting
+
+#### From vectorised functions
+```{r}
+df <- tribble(
+  ~x1,
+  "a,b,c", 
+  "d,e,f,g"
+) 
+df %>% 
+  mutate(x2 = stringr::str_split(x1, ","))
+```
+`purrr::invoke_map` is a powerful function that you get a function and pass a list of parameters to it.
+
+```{r}
+sim <- tribble(
+  ~f,      ~params,
+  "runif", list(min = -1, max = -1),
+  "rnorm", list(sd = 5),
+  "rpois", list(lambda = 10)
+)
+
+sim %>%
+  mutate(sims = invoke_map(f, params, n = 10))
+```
+```{r}
+rm(list = ls())
+sim <- tibble::tribble(
+  ~f,      ~params,
+  "runif", list(min = -1, max = -1),
+  "rnorm", list(sd = 5),
+  "rpois", list(lambda = 10)
+)%>%
+  mutate(sims = purrr::invoke_map(f, params, n = 10))
+```
+
+```{r}
+mydata <- 
+  tibble(col_a = rep(c("a", "b"), 5)) %>% 
+  mutate(col_b = map(col_a, function (x) { list(a = x, b = x, c = x) }))
+mydata%>% 
+  filter (col_a == "a")
+
+mydata <- 
+  tibble(col_a = rep(c("a", "b"), 5)) %>% 
+  mutate(col_b = map(col_a, function (x) { list(a = x, b = x, c = x) }))%>% 
+  filter (col_a == "a")
+class(mydata)
+```
+
+#### From multivalued summaries
+
+See `quantile()`
+
+#### From a named list
+
+See `enframe()`
+
+
+### 25.4.5 Exercises {-}
+
+1. List all the functions that you can think of that take a atomic vector and return a list.
+
+`quantile` is an example
+
+2. Brainstorm useful summary functions that, like `quantile()`, return multiple values.
+
+You can write one for example as the example I constructed from answers based on this [post](https://stackoverflow.com/questions/29500407/dplyr-summarise-when-function-return-is-vector-valued)
+```{r}
+df <- data.frame(group=c('A','A','A','A','B','B','B','B','C','C','C','C'), x=rnorm(12,1,1), y=rnorm(12,1,1))
+f <- function(x,y) list(setNames(coef(lm(x ~ y)), c("a", "b")))
+df %>%
+  group_by(group)%>%
+  summarise(coef = f(x,y))
+```
+3. What’s missing in the following data frame? How does `quantile()` return that missing piece? Why isn’t that helpful here?
+
+Not sure what the question is asking for.
+
+4. What does this code do? Why might might it be useful?
+
+I slightly modified the code to make its behavior more explicit
+```{r,eval=FALSE}
+myfun <- function(x){
+  list(quantile(x))
+}
+
+mtcars %>% 
+  group_by(cyl) %>% 
+  summarise_each(funs(myfun))
+```
+This code apply the `list` function to each variable of the grouped data frames. This may be useful if you want to apply different `summarize` functions to different columns. Here we just use the same function `list`.
+
+
+## Simplifying list-columns
+
+### List to vector
+```{r}
+df <- tribble(
+  ~x,
+  letters[1:5],
+  1:3,
+  runif(5)
+)
+```
+`purrr::map_char` takes a column whose element is a list and map each list to a `char` using provided function. Similar ideas apply for `map_int`, etc.
+
+### Unnest
+
+unnesting two columns simultaneously requires they have exactly the same shape. The following code fails
+
+```{r,eval=FALSE}
+df2 <- tribble(
+  ~x, ~y,           ~z,
+   1, "a",         1:2,  
+   2, c("b", "c"),   3
+)
+df2 %>% unnest(y, z)
+```
+
+
+### 25.5.3 Exercises {-}
+
+1. Why might the `lengths()` function be useful for creating atomic vector columns from list-columns?
+
+Because you can't use `count` directly and `lengths()` is equivalent to the `n()` when the data frame is not nested. 
+
+The following three ways all calculate the number of observables in each group.
+
+```{r}
+df <- data.frame(group=c('A','A','A','A','B','B','B','B','C','C','C','C'), x=rnorm(12,1,1), y=rnorm(12,1,1))
+
+df %>% 
+  group_by(group)%>%
+  summarize(n = n())
+df %>%
+  group_by(group)%>%
+  nest() %>%
+  mutate(
+    n = map_int(data,nrow)
+  )
+df %>%
+  group_by(group) %>%
+  summarize_each(funs(list)) %>%
+  mutate(n = map_int(x,length))
+
+```
+2. List the most common types of vector found in a data frame. What makes lists different?
+    1. bool
+    2. numeric
+    3. integer
+    4. factor
+    5. char
+List is special because it is nested, a list can contain other lists and any other kind of elements.
+
+## Making tidy data with broom
+
+Note:
+
+To turn models into tidy data frames
+
+1. `broom::glance(model)`
+2. `broom::tidy(mdoel)`
+3. `broom::augment(model,data)`
