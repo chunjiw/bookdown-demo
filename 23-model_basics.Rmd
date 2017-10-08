@@ -13,6 +13,8 @@ library(modelr)
 
 ## Introduction
 
+## A simple model
+
 ### 23.2.1 Exercises {-}
 1. One downside of the linear model is that it is sensitive to unusual values because the distance incorporates a squared term. Fit a linear model to the simulated data below, and visualise the results. Rerun a few times to generate different simulated datasets. What do you notice about the model?
 
@@ -89,6 +91,8 @@ ggplot(sim1a, aes(x, y)) +
 ```
 There are essentially infinitely many solutions since the model we built contains redudant information in `a[1]` and `a[3]`.
 
+## Visualising models
+
 ### 23.3.3 Exercises {-}
 
 1.Instead of using `lm()` to fit a straight line, you can use `loess()` to fit a smooth curve. Repeat the process of model fitting, grid generation, predictions, and visualisation on sim1 using `loess()` instead of `lm()`. How does the result compare to `geom_smooth()`?
@@ -136,6 +140,7 @@ ggplot() +
 
 You want to check the absolute residuals because it helps to see the overall quality of the prediction but it won't give you the hint about the distribution of residuals with respect to *0*. For example, it may be possible that there is only one large possitve residual and many small negative ones.
 
+## Formulas and model families
 
 ### 23.4.5 Exercises {-}
 
@@ -231,6 +236,8 @@ sim4 %>%
 ```
 It is not that obvious but visually detectable.
 
+## Missing values
+
 Notes on handling NA behaviors.
 
 ```{r}
@@ -240,9 +247,21 @@ options(na.action = na.warn)
 lm(y~x,data = sim1, na.action = na.exclude)
 ```
 
+## Other model families
 
+Note:
 
-
+1. **Generalised linear models**
+    1. remove assumptions that response is continuous and error is normally distributed.
+    2. define distance metric based on the statistical idea of likelihood.
+2. **Generalised additive models**
+    1. incorporate arbitrary smooth functions beyond `GLM`.
+3. **Penalised linear models**
+    1. penalize complex models.
+4. **Robust linear models**
+    1. tweak distances which are too long.
+5. **Trees**
+    1. separate data into pieces. Aggregated trees like *random forests* and *gradient boosting machines* are powerful models.
 
 
 

@@ -1,0 +1,87 @@
+# Model Building
+
+Author: Ron 
+Reviewer:
+
+## Introduction
+
+### prerequisites
+```{r,message=FALSE}
+library(tidyverse)
+library(modelr)
+options(na.action = na.warn)
+
+library(nycflights13)
+library(lubridate)
+```
+
+## Why are low quality diamonds more expensive
+
+### Price and carat
+
+Note:
+
+Residuals of a model contain the information that doesn't get caught by this model. By examining the residual of the following model
+```{r}
+fit1 <- lm(data = diamonds,log(price)~log(carat))
+```
+A positive relationship of the residual with one additional predictor means there is a positive correlation between them. For example, `residual ~ cut` means cut may partially explain the increase of the prediction error of `fit1`. This becomes more obvious when the residual is transformed back from `log` scale which explains the exponential price growth with respect to `cut` or `clarity`.
+
+### A more complicated model
+
+### 24.2.3 Exercises {-}
+
+1.In the plot of `lcarat` vs. `lprice`, there are some bright vertical strips. What do they represent?
+```{r}
+diamonds2 <- diamonds %>% 
+  filter(carat <= 2.5) %>% 
+  mutate(lprice = log2(price), lcarat = log2(carat))
+
+ggplot(diamonds2, aes(lcarat, lprice)) + 
+  geom_hex(bins = 50)
+```
+Those bright vertical strips mean that many diamonds are cut to those "standard" or popular "weight" since bright means higher count.
+
+2.If `log(price) = a_0 + a_1 * log(carat)`, what does that say about the relationship between price and carat?
+
+It means `price = exp(a_0)*carat^(a_1)`.
+
+3.Extract the diamonds that have very high and very low residuals. Is there anything unusual about these diamonds? Are the particularly bad or good, or do you think these are pricing errors?
+
+```{r}
+diamonds2 <- diamonds %>% 
+  filter(carat <= 2.5) %>% 
+  mutate(lprice = log2(price), lcarat = log2(carat))
+
+mod_diamond <- lm(lprice ~ lcarat, data = diamonds2)
+
+diamonds2 <- diamonds2 %>%
+  add_residuals(mod_diamond,'lresid')
+
+summary(diamonds2$lresid)
+
+diamonds3 <- diamonds2 %>% filter(lresid > quantile(lresid)[[3]] | lresid < quantile(lresid)[[1]] )
+
+table(diamonds3$cut)
+table(diamonds3$clarity)
+
+diamonds3 %>% 
+  ggplot(aes(clarity,price))+
+  geom_boxplot()+
+  facet_grid(~cut)
+```
+There are surely errrs here. diamonds with better clarity are priced lower.
+
+4. No. Since the predictors are not normalized and treated equally in the model. There are some diamonds which are very expensive but predicted to be cheap or vice versa.
+
+
+## What affects the number of daily flights
+
+
+
+
+
+
+
+
+
