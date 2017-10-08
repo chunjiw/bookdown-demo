@@ -1,0 +1,103 @@
+# Many models
+
+Author: Ron 
+Reviewer:
+  
+## Introduction
+
+Note:
+
+1. Use many simple models to better understand complex datasets
+2. Use list-columns to store arbitrary data stracture in a data frame
+3. Use **broom** package to turn models into tidy data
+
+### Prerequisites
+```{r}
+library(modelr)
+library(tidyverse)
+library(gapminder)
+```
+
+## gapminder
+```{r}
+gapminder
+```
+
+### Nested data
+
+use `nest()` function to create a dataframe of dataframes which has a column called `data`.
+
+```{r}
+by_country <- gapminder %>%
+  group_by(country, continent) %>%
+  nest()
+```
+Use `mutate` and `purrr::map` to generate new column, the model itself, which is an S3 object.
+
+```{r}
+country_model <- function(df) {
+  lm(lifeExp ~ year, data = df)
+}
+by_country <- by_country %>% 
+  mutate(model = map(data, country_model))
+by_country
+```
+
+### Unnesting
+`purrr::map2` can map mulitple inputs simultaneously
+```{r}
+by_country <- by_country %>%
+  mutate(resids = map2(data, model, add_residuals)
+         # data here is the column name, so is model.
+         )
+
+unnest(by_country,resids)
+```
+Note that each row is one *data point* in the original `gapminder` but the resid calculated is based on the country-wise model.
+
+### Model quality
+
+Use `broom` package to check model quality metrices. `broom::glance` takes a model as input
+
+```{r}
+glance <- by_country %>%
+  mutate(glance = map(model, broom::glance)) %>%
+  unnest(glance, .drop = TRUE)
+# drop the list columns, `data`, `model` and `resid`
+```
+Note that each `model` gives a set of metrics.
+
+```{r}
+bad_fit <- filter(glance, r.squared < 0.25)
+
+gapminder %>% 
+  semi_join(bad_fit, by = "country") %>% 
+  ggplot(aes(year, lifeExp, colour = country)) +
+    geom_line()
+```
+
+### 25.2.5 Exercises
+
+1. A linear trend seems to be slightly too simple for the overall trend. Can you do better with a quadratic polynomial? How can you interpret the coefficients of the quadratic? (Hint you might want to transform `year` so that it has mean zero.)
+
+```{r}
+modquad <- function(df){
+  lm(data = df, lifeExp ~ poly(year,2))
+}
+
+quad <- gapminder %>%
+  mutate(year = year - mean(year)) %>%
+  group_by(country)%>%
+  nest()%>%
+  mutate(model = purrr::map(data,modquad))
+  
+```
+
+
+
+
+
+
+
+
+
