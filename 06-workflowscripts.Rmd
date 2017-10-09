@@ -1,6 +1,7 @@
 # Workflow: scripts
 
-Author: CW
+Author: CW  
+Status: Finished
 
 ## 6.3 Practice {-}
 1. RStudio Twitter account followed!  
