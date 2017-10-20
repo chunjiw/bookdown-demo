@@ -51,7 +51,7 @@ Seems like `x` and `y` should be length and width, and `z` is depth.
 # remove false data points
 diamonds <- diamonds %>% filter(2 < y & y < 20 & 2 < x & 2 < z & z < 20)
 ggplot(diamonds) + 
-  geom_freqpoly(aes(x = price), binwidth = 30) +
+  geom_freqpoly(aes(x = price), binwidth = 10) +
   xlim(c(1000, 2000))
 ```
 
@@ -59,11 +59,13 @@ Somehow we don't have diamonds that are priced around $1500.
 
 3. How many diamonds are 0.99 carat? How many are 1 carat? What do you think is the cause of the difference?
 ```{r}
+diamonds %>% filter(carat == 0.99) %>% count()
+diamonds %>% filter(carat == 1) %>% count()
 ggplot(diamonds) + 
   geom_histogram(aes(x = carat), binwidth = 0.01) +
   xlim(c(0.97, 1.03))
 ```
-Compare to price, customers are pleased to see more carat, so 1 carat is inherently better than 0.99 carat.
+There are much more diamonds with 1 carat. I think it is because psychologically, 1 carat represent a whole new level from 0.99 carat, so for makers, it is little more material for much more value.
 
 4. Compare and contrast `coord_cartesian()` vs `xlim()` or `ylim()` when zooming in on a histogram. What happens if you leave `binwidth` unset? What happens if you try and zoom so only half a bar shows?
 
@@ -89,8 +91,24 @@ ggplot(diamonds) +
 1. What happens to missing values in a histogram? What happens to missing values in a bar chart? Why is there a difference?  
 In a bar chart, `NA` is considered as just another category. In a histogram, `NA` is ignored because the x exis has order.
 
+```{r}
+set.seed(0)
+df <- tibble(norm = rnorm(100)) %>% mutate(inrange = ifelse(norm > 2, NA, norm))
+ggplot(df) +
+  geom_histogram(aes(x = inrange))
+```
+
+`geom_histogram()` removed rows with `NA` values; 
+
+```{r}
+df <- diamonds %>% mutate(cut = as.factor(ifelse(y > 7, NA, cut)))
+ggplot(df) + geom_bar(aes(x = cut))
+```
+
+Apparently `geom_bar()` doesn't remove `NA`, but rather treat it as another factor or category.
+
 2. What does `na.rm = TRUE` do in `mean()` and `sum()`?   
-They calculate after removing `NA`s.
+To ignore `NA`s when calculating mean and sum.
 
 ## Covariation
 ### A categorical and continuous variable
