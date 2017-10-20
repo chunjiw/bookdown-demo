@@ -1,7 +1,7 @@
 # Exploratory Data Analysis
 
 Author: CW  
-Status: On-going
+Status: On-going  
 Reviewer:
 
 ## Introduction
@@ -128,3 +128,64 @@ flights %>%
 Puzzled by this question: how do we have departure times of cancelled flights?
 
 2. What variable in the diamonds dataset is most important for predicting the price of a diamond? How is that variable correlated with cut? Why does the combination of those two relationships lead to lower quality diamonds being more expensive?
+
+```{r}
+ggplot(diamonds) +
+  geom_point(aes(x = carat, y = price), color = "blue", alpha = 0.5)
+ggplot(diamonds) +
+  geom_point(aes(x = depth, y = price), color = "red", alpha = 0.5)
+ggplot(diamonds) +
+  geom_point(aes(x = table, y = price), color = "red", alpha = 0.5)
+ggplot(diamonds) +
+  geom_point(aes(x = x, y = price), color = "red", alpha = 0.5)
+ggplot(diamonds) +
+  geom_point(aes(x = z, y = price), color = "red", alpha = 0.5)
+```
+
+Volumn and weight are two variables that is most important for predicting the price. Since volumn is highly correlated with weight, they can be considered to be one variable. 
+
+```{r}
+ggplot(diamonds) +
+  geom_boxplot(aes(x = cut, y = carat))
+```
+
+Because better `cut` has lower `carat` which makes their `price` lower, so if we don't look at `carat`, it would appear that better `cut` has lower `price`.
+
+3. Install the `ggstance` package, and create a horizontal boxplot. How does this compare to using `coord_flip()`?
+
+```{r}
+library(ggstance)
+ggplot(diamonds) + geom_boxplot(aes(x = cut, y = carat)) + coord_flip()
+ggplot(diamonds) + geom_boxploth(aes(x = carat, y = cut))
+
+```
+
+Seems like the result is the same; but the call of the function seems more natural.
+
+4. One problem with boxplots is that they were developed in an era of much smaller datasets and tend to display a prohibitively large number of “outlying values”. One approach to remedy this problem is the letter value plot. Install the `lvplot` package, and try using `geom_lv()` to display the distribution of `price` vs `cut`. What do you learn? How do you interpret the plots?
+
+```{r}
+library(lvplot)
+ggplot(diamonds) + geom_lv(aes(x = cut, y = price))
+```
+
+While the boxplot only shows a few quantiles and outliers, the letter-value plot shows many quantiles.
+
+5. Compare and contrast `geom_violin()` with a facetted `geom_histogram()`, or a coloured `geom_freqpoly()`. What are the pros and cons of each method?
+
+```{r}
+ggplot(diamonds) +
+  geom_histogram(aes(x = price)) +
+  facet_wrap(~cut)
+ggplot(diamonds) +
+  geom_freqpoly(aes(x = price)) +
+  facet_wrap(~cut)
+ggplot(diamonds) +
+  geom_violin(aes(x = cut, y = price))
+ggplot(diamonds) +
+  geom_lv(aes(x = cut, y = price))
+```
+
+Violin plot is best to compare the density distribution across different categories.
+
+6. If you have a small dataset, it’s sometimes useful to use `geom_jitter()` to see the relationship between a continuous and categorical variable. The ggbeeswarm package provides a number of methods similar to `geom_jitter()`. List them and briefly describe what each one does.
