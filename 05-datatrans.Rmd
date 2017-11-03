@@ -1,13 +1,22 @@
 # Data transformation
 
 Author: yueyanw  
-Reviewer: Chunji
+Reviewer: chunjiw at 11/3/2017
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(nycflights13)
 ```
-### 5.2.4 Exercises
+
+##
+
+##
+
+###
+###
+###
+
+### Exercises
 1. Find all flights that
     1. Had an arrival delay of two or more hours
         ```{r}
@@ -23,16 +32,32 @@ library(nycflights13)
     6. Were delayed by at least an hour, but made up over 30 minutes in flight
     7. Departed between midnight and 6am (inclusive)
 
+##
 
+### Exercises
 
-5.3.1.1 How could you use `arrange()` to sort all missing values to the start? (Hint: use `is.na()`).
+1. How could you use `arrange()` to sort all missing values to the start? (Hint: use `is.na()`).
 
 ```{r}
 df <- tibble(x = c(5, 2, NA))
 arrange(df, !is.na(x), x)
 ```
 
-5.6.7.2
+##
+
+##
+
+##
+
+###
+###
+###
+###
+###
+###
+### Exercises
+
+2. 
 
 ```{r}
 not_cancelled <- flights %>% 
