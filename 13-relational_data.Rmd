@@ -1,4 +1,65 @@
 # Relational data
 
-Author:  
+Author: Chunji Wang  
 Reviewer:
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+##
+###
+```{r}
+library(tidyverse)
+library(nycflights13)
+```
+
+##
+### Exercises
+1. Imagine you wanted to draw (approximately) the route each plane flies from its origin to its destination. What variables would you need? What tables would you need to combine?  
+
+We need `tailnum` to identify planes, `origin` and `dest` to identify airports; we need to combine `airports` with `flights` to get geolocation of airports.
+
+2. I forgot to draw the relationship between `weather` and `airports`. What is the relationship and how should it appear in the diagram?
+
+They should be connected via `origin`. 
+
+3. `weather` only contains information for the `origin` (NYC) airports. If it contained weather records for all airports in the USA, what additional relation would it define with flights?
+
+It would define another relationship via `dest`.
+
+4. We know that some days of the year are “special”, and fewer people than usual fly on them. How might you represent that data as a data frame? What would be the primary keys of that table? How would it connect to the existing tables?
+
+A table with `dates` as the primary key, and another column `special` indicating whether this date is special or not. It would connect to `flights` via `year` `month` `day` variables.
+
+## Keys
+```{r}
+planes %>% count(tailnum)
+```
+
+### Exercises
+1. Add a surrogate key to `flights`.
+```{r}
+flights %>% mutate(row_number = row_number())
+```
+
+2. Identify the keys in the following datasets
+    1. `Lahman::Batting`
+    2. `babynames::babynames`
+    3. `nasaweather::atmos`
+    4. `fueleconomy::vehicles`
+    5. `ggplot2::diamonds`
+```{r}
+Lahman::Batting
+babynames::babynames
+nasaweather::atmos
+fueleconomy::vehicles
+ggplot2::diamonds
+```
+
+3. Draw a diagram illustrating the connections between the `Batting`, `Master`, and `Salaries` tables in the `Lahman` package. Draw another diagram that shows the relationship between `Master`, `Managers`, `AwardsManagers`.  
+How would you characterise the relationship between the `Batting`, `Pitching`, and `Fielding` tables?
+
+## Mutating joins
+
+
