@@ -1,4 +1,43 @@
 # Dates and times
 
-Author:  
-Reviewer:
+Author: chunjiw  
+Reviewer:  
+Last updated: 11/16/2017
+
+##
+###
+```{r}
+library(tidyverse)
+library(lubridate)
+library(nycflights13)
+```
+
+## Creating date/times
+###
+###
+###
+### Exercises
+1. What happens if you parse a string that contains invalid dates?
+```{r}
+ymd(c("20101010", "bananas"))
+```
+It returns `NA`.
+
+2. What does the `tzone` argument to `today()` do? Why is it important?
+Specify the time zone. The date depends on time zone at any given moment.
+
+3. Use the appropriate lubridate function to parse each of the following dates:
+```{r}
+d1 <- "January 1, 2010"
+d2 <- "2015-Mar-07"
+d3 <- "06-Jun-2017"
+d4 <- c("August 19 (2015)", "July 1 (2015)")
+d5 <- "12/30/14" # Dec 30, 2014
+mdy(d1)
+ymd(d2)
+dmy(d3)
+mdy(d4)
+mdy(d5)
+```
+
+## Date-time components
